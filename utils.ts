@@ -1,7 +1,10 @@
-import * as axios from 'axios'
+import axios from 'axios'
+import * as fs from 'fs'
+// const axios = require('axios')
+// const fs  = require('fs')
 
-const getRequest = (method: string) => {
-  return (url: string, data: any = null, options: any = {}) => {
+const getRequest = (method) => {
+  return (url, data = null, options = {} as any) => {
     // @ts-ignore
     return axios({
       baseURL: 'http://localhost:8080', // 请求域名地址
@@ -49,3 +52,39 @@ const getRequest = (method: string) => {
 export const get = getRequest('GET')
 
 export const post = getRequest('POST')
+
+export const getProxy = async () => {
+  let { data } = await axios.get('http://localhost:5010/get')
+  let p = data.proxy.split(':')
+  return { host: p[0], port: Number(p[1]) }
+}
+
+let host
+let port
+
+export const downloadFile = async (url, filePath) => {
+  if (!host) {
+    let data = await getProxy()
+    host = data.host
+    port = data.port
+  }
+  try {
+    let { data } = await axios({
+      method: 'get',
+      url: url,
+      responseType: 'stream',
+      proxy: {
+        host,
+        port,
+      },
+    })
+    data.pipe(fs.createWriteStream(filePath))
+  } catch (err) {
+    console.log(err)
+
+    let data = await getProxy()
+    host = data.host
+    port = data.port
+    return await downloadFile(url, filePath)
+  }
+}

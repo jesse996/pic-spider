@@ -1,4 +1,4 @@
-import { post } from './utils'
+import { post } from './utils.js'
 import type { Page } from 'puppeteer-core'
 import * as puppeteer from 'puppeteer-core'
 import { promises } from 'fs'
@@ -32,7 +32,7 @@ const { readFile, writeFile } = promises
   // await goNews(page)
 
   //妹子图
-  await goMeizi(page)
+  // await goMeizi(page)
 
   await browser.close()
 })()
@@ -246,7 +246,7 @@ async function goMeizi(page: Page) {
 }
 
 /**
- * 点击加载更多
+ * 一日仓管点击加载更多
  */
 async function loadMore(page: Page) {
   while (true) {
