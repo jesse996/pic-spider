@@ -79,12 +79,14 @@ export const downloadFile = async (url, filePath) => {
       },
     })
     data.pipe(fs.createWriteStream(filePath))
+    //下2遍避免失败
+    // data.pipe(fs.createWriteStream(filePath))
   } catch (err) {
     console.log(err)
 
     let data = await getProxy()
     host = data.host
     port = data.port
-    return await downloadFile(url, filePath)
+    await downloadFile(url, filePath)
   }
 }

@@ -13,7 +13,7 @@ const { readFile, writeFile } = promises
 
   const browser = await puppeteer.launch({
     headless: false,
-    args: [`--proxy-server=${proxy}`],
+    // args: [`--proxy-server=${proxy}`],
     defaultViewport: { width: 1000, height: 1200 },
     executablePath:
       // 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
@@ -21,23 +21,23 @@ const { readFile, writeFile } = promises
   })
   const page = await browser.newPage()
 
-  // await page.setRequestInterception(true)
-  // page.on('request', async (interceptedRequest) => {
-  //   //代理
-  //   // await proxyRequest({
-  //   //   page,
-  //   //   proxyUrl: `http://${host}:${port}`,
-  //   //   interceptedRequest,
-  //   // })
-  //   //判断如果是 图片请求  就直接拦截
-  //   if (
-  //     interceptedRequest.url().endsWith('.png') ||
-  //     interceptedRequest.url().endsWith('.jpg')
-  //   )
-  //     interceptedRequest.abort()
-  //   //终止请求
-  //   else interceptedRequest.continue() //弹出
-  // })
+  await page.setRequestInterception(true)
+  page.on('request', async (interceptedRequest) => {
+    //代理
+    // await proxyRequest({
+    //   page,
+    //   proxyUrl: `http://${host}:${port}`,
+    //   interceptedRequest,
+    // })
+    //判断如果是 图片请求  就直接拦截
+    if (
+      interceptedRequest.url().endsWith('.png') ||
+      interceptedRequest.url().endsWith('.jpg')
+    )
+      interceptedRequest.abort()
+    //终止请求
+    else interceptedRequest.continue() //弹出
+  })
 
   await page.goto('https://www.mzitu.com/zhuanti/')
   await page.waitForTimeout(500)
@@ -56,13 +56,13 @@ const { readFile, writeFile } = promises
   console.log('href:', href)
   await go(page, href)
 
-  // await go(page, 'https://www.mzitu.com/241944')
+  // await page.goto('https://www.mzitu.com/203924')
 
   let imgList = []
   let first = true
   let path
   let title
-  let count = 1
+  let count = 172
   while (true) {
     // try {
     console.log('current url: ' + (await page.url()))
@@ -85,27 +85,26 @@ const { readFile, writeFile } = promises
         .trim()
         .replace(/[":\\/\>\<\|\*\?]/g, '')
         .replace(/\s/g, ',')
-      path = `./images2/${count}-${title}`
+      path = `./image/${title}`
 
       console.log('create dir:', path)
 
       await promises.mkdir(path, { recursive: true })
       first = false
     }
-    console.log('img: ', img)
+    console.log('img:', img)
 
     // let proxyImgAddr = `http://api.scraperapi.com?api_key=2ad954bc26017c2bd2c41a66bb6eb7c3&url=${img}`
 
     // let proxyImgAddr = img
-    // await downloadFile(img, `${path}/${filename}`)
+    await downloadFile(img, `${path}/${filename}`)
+    await page.waitForTimeout(300)
 
-    const imgResp = await page.waitForResponse(img, {
-      timeout: 10000,
-    })
-    console.log('imgResp: ', imgResp)
-    const buffer = await imgResp.buffer()
-    const imgBase64 = buffer.toString('base64')
-    await writeFile(`${path}/${filename}`, imgBase64, 'base64')
+    // const imgResp = await page.waitForResponse(img)
+    // console.log('imgResp: ', imgResp)
+    // const buffer = await imgResp.buffer()
+    // const imgBase64 = buffer.toString('base64')
+    // await writeFile(`${path}/${filename}`, imgBase64, 'base64')
 
     imgList.push(img)
 
