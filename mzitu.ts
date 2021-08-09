@@ -16,8 +16,7 @@ const { readFile, writeFile } = promises
     args: [`--proxy-server=${proxy}`],
     defaultViewport: { width: 1000, height: 1200 },
     executablePath:
-      // 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
-      'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+      'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
   })
   const page = await browser.newPage()
 
