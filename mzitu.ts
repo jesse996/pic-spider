@@ -7,9 +7,8 @@ import * as fs from 'fs'
 const { readFile, writeFile } = promises
 
 ;(async () => {
-  let { host, port }: { host: string; port: number } = await getProxy()
-  let proxy = `http://${host}:${port}`
-  console.log('proxy:', proxy)
+  // let { host, port }: { host: string; port: number } = await getProxy()
+  // let proxy = `http://${host}:${port}`
 
   const browser = await puppeteer.launch({
     headless: false,
@@ -39,36 +38,34 @@ const { readFile, writeFile } = promises
     else interceptedRequest.continue() //弹出
   })
 
-  await page.goto('https://www.mzitu.com/zhuanti/')
-  await page.waitForTimeout(500)
-  await page.waitForSelector('.tags a:first-child')
-  let href = await page.$eval('.tags a:first-child', (el) =>
-    el.getAttribute('href')
-  )
-  console.log('href:', href)
+  // await page.goto('https://www.mzitu.com/zhuanti/')
+  // await page.waitForTimeout(500)
+  // await page.waitForSelector('.tags a:first-child')
+  // let href = await page.$eval('.tags a:first-child', (el) =>
+  //   el.getAttribute('href')
+  // )
+  // console.log('href:', href)
 
-  await go(page, href)
+  // await go(page, href)
 
-  await page.waitForSelector('#pins')
-  href = await page.$eval('#pins>li>a:first-child', (el) =>
-    el.getAttribute('href')
-  )
-  console.log('href:', href)
-  await go(page, href)
+  // await page.waitForSelector('#pins')
+  // href = await page.$eval('#pins>li>a:first-child', (el) =>
+  //   el.getAttribute('href')
+  // )
+  // console.log('href:', href)
+  // await go(page, href)
 
-  // await page.goto('https://www.mzitu.com/203924')
+  await page.goto('https://www.mzitu.com/246810')
 
   let imgList = []
   let first = true
   let path
   let title
-  let count = 172
   while (true) {
-    // try {
     console.log('current url: ' + (await page.url()))
 
     try {
-      await page.waitForSelector('.main-image img', { timeout: 3000 })
+      await page.waitForSelector('.main-image img', { timeout: 10000 })
     } catch (e) {
       console.log(e)
       await page.reload()
@@ -100,12 +97,6 @@ const { readFile, writeFile } = promises
     await downloadFile(img, `${path}/${filename}`)
     await page.waitForTimeout(300)
 
-    // const imgResp = await page.waitForResponse(img)
-    // console.log('imgResp: ', imgResp)
-    // const buffer = await imgResp.buffer()
-    // const imgBase64 = buffer.toString('base64')
-    // await writeFile(`${path}/${filename}`, imgBase64, 'base64')
-
     imgList.push(img)
 
     //下一页
@@ -120,7 +111,6 @@ const { readFile, writeFile } = promises
 
     if (end) {
       first = true
-      count++
 
       //标签
       let tag: string = await page.$eval('.main-meta a', (el) => el.textContent)
@@ -137,19 +127,22 @@ const { readFile, writeFile } = promises
         src: 'www.mzitu.com',
         tags: [{ name: tag, type: 0 }],
       }
-      console.log('end')
       console.log(data)
 
       await post('/pic', data)
 
       //清空imgList
       imgList = []
+
+      break
     }
 
     await page.click('.pagenavi a:last-child')
   }
 
-  await browser.close()
+  //等待图片下载
+  await page.waitForTimeout(10000)
+  // await browser.close()
 })()
 
 async function go(page: Page, url: string) {

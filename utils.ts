@@ -55,6 +55,7 @@ export const post = getRequest('POST')
 
 export const getProxy = async () => {
   let { data } = await axios.get('http://localhost:5010/get')
+  console.log('proxy:', data.proxy)
   let p = data.proxy.split(':')
   return { host: p[0], port: Number(p[1]) }
 }
@@ -79,14 +80,28 @@ export const downloadFile = async (url, filePath) => {
       },
     })
     data.pipe(fs.createWriteStream(filePath))
-    //下2遍避免失败
-    // data.pipe(fs.createWriteStream(filePath))
+    console.log('download success')
   } catch (err) {
-    console.log(err)
+    console.log(getError(err))
 
     let data = await getProxy()
     host = data.host
     port = data.port
     await downloadFile(url, filePath)
   }
+}
+
+const getError = (error) => {
+  let e = error
+  if (error.response) {
+    e = error.response.data // data, status, headers
+    if (error.response.data && error.response.data.error) {
+      e = error.response.data.error // my app specific keys override
+    }
+  } else if (error.message) {
+    e = error.message
+  } else {
+    e = 'Unknown error occured'
+  }
+  return e
 }
