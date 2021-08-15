@@ -55,7 +55,7 @@ const { readFile, writeFile } = promises
   // console.log('href:', href)
   // await go(page, href)
 
-  await page.goto('https://www.mzitu.com/246810')
+  await page.goto('https://www.mzitu.com/246886')
 
   let imgList = []
   let first = true
