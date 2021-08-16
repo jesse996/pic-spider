@@ -27,8 +27,39 @@ const { readFile, writeFile } = promises
     else interceptedRequest.continue() //弹出
   })
 
-  await goto(page, 'https://www.jdlingyu.com/96003.html')
-  await page.screenshot({path:'jd.png'})
+  await goto(page, 'https://www.jdlingyu.com/96018.html')
+
+  while (true) {
+    let title = await page.$eval('.entry-header h1', (el) => el.textContent)
+    // console.log(title)
+
+    let imgList = await page.$$eval('.entry-content img', (els) =>
+      els.map((el) => el.getAttribute('src'))
+    )
+    console.log(imgList)
+
+    let data = {
+      coverImg: imgList[0],
+      title,
+      imgList,
+      src: 'www.jdlingyu.com',
+      type: 3, //清纯妹子
+    }
+    console.log(data)
+
+    let res = await post('/pic', data)
+    console.log(res)
+
+    await page.waitForTimeout(300)
+    try {
+      //下一页
+      await page.click('.post-pre h2 a')
+    } catch (e) {
+      console.log(e)
+      break
+    }
+  }
+  await browser.close()
 })()
 
 async function goto(page: Page, url: string) {
