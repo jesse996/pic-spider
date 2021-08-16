@@ -1,9 +1,7 @@
 import { downloadFile, getProxy, post } from './utils'
 import type { Page } from 'puppeteer-core'
 import * as puppeteer from 'puppeteer-core'
-import { proxyRequest } from 'puppeteer-proxy'
 import { promises } from 'fs'
-import * as fs from 'fs'
 const { readFile, writeFile } = promises
 
 ;(async () => {
@@ -22,12 +20,6 @@ const { readFile, writeFile } = promises
 
   await page.setRequestInterception(true)
   page.on('request', async (interceptedRequest) => {
-    //代理
-    // await proxyRequest({
-    //   page,
-    //   proxyUrl: `http://${host}:${port}`,
-    //   interceptedRequest,
-    // })
     //判断如果是 图片请求  就直接拦截
     if (
       interceptedRequest.url().endsWith('.png') ||
@@ -129,7 +121,8 @@ const { readFile, writeFile } = promises
       }
       console.log(data)
 
-      await post('/pic', data)
+      let res = await post('/pic', data)
+      console.log(res)
 
       //清空imgList
       imgList = []
@@ -142,21 +135,10 @@ const { readFile, writeFile } = promises
 
   //等待图片下载
   await page.waitForTimeout(10000)
-  // await browser.close()
+  await browser.close()
 })()
 
 async function go(page: Page, url: string) {
   await Promise.all([page.waitForNavigation(), page.goto(url)])
 }
 
-function isFileExisted(path_way) {
-  return new Promise((resolve, reject) => {
-    fs.access(path_way, (err) => {
-      if (err) {
-        resolve(false) //"不存在"
-      } else {
-        resolve(true) //"存在"
-      }
-    })
-  })
-}
