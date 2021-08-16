@@ -53,7 +53,11 @@ const { readFile, writeFile } = promises
     await page.waitForTimeout(300)
     try {
       //下一页
-      await page.click('.post-pre h2 a')
+      await Promise.all([
+        page.waitForNavigation(),
+        page.click('.post-pre h2 a'),
+      ])
+      await page.waitForTimeout(100)
     } catch (e) {
       console.log(e)
       break
