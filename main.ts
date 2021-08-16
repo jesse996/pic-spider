@@ -1,4 +1,4 @@
-import { post } from './utils.js'
+import { post } from './utils'
 import type { Page } from 'puppeteer-core'
 import * as puppeteer from 'puppeteer-core'
 import { promises } from 'fs'
@@ -32,7 +32,7 @@ const { readFile, writeFile } = promises
   // await goNews(page)
 
   //妹子图
-  // await goMeizi(page)
+  await goMeizi(page)
 
   await browser.close()
 })()
@@ -89,6 +89,8 @@ async function goCosplay(page: Page) {
       coverImg: item.img,
       title: item.title,
       imgList,
+      type: 2,
+      src: 'www.zhaimoe.com',
     }
 
     await post('/pic', pic).catch((e) => {
@@ -165,7 +167,6 @@ async function goNews(page: Page) {
           )
       }
 
-      await writeFile('content.json', JSON.stringify(content))
       let news = {
         coverImg: item.coverImg,
         title: item.title,
@@ -236,7 +237,8 @@ async function goMeizi(page: Page) {
       title: item.title,
       imgList,
       description,
-      type: 0,
+      type: 3,
+      src: 'www.zhaimoe.com',
     }
 
     await post('/pic', pic).catch((e) => {
