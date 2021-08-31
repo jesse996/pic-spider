@@ -74,10 +74,10 @@ export const downloadFile = async (url, filePath) => {
       method: 'get',
       url: url,
       responseType: 'stream',
-      proxy: {
-        host,
-        port,
-      },
+      // proxy: {
+      //   host,
+      //   port,
+      // },
     })
     data.pipe(fs.createWriteStream(filePath))
     console.log('download success')

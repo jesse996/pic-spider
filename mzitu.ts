@@ -14,19 +14,14 @@ const { readFile, writeFile } = promises
     defaultViewport: { width: 1000, height: 1200 },
     executablePath:
       'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
+    // 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
   })
   const page = await browser.newPage()
 
   await page.setRequestInterception(true)
   page.on('request', async (interceptedRequest) => {
-    //判断如果是 图片请求  就直接拦截
-    if (
-      interceptedRequest.url().endsWith('.png') ||
-      interceptedRequest.url().endsWith('.jpg')
-    )
-      interceptedRequest.abort()
-    //终止请求
-    else interceptedRequest.continue() //弹出
+    if (interceptedRequest.url().includes('php')) interceptedRequest.abort()
+    else interceptedRequest.continue()
   })
 
   // await page.goto('https://www.mzitu.com/zhuanti/')
@@ -46,14 +41,30 @@ const { readFile, writeFile } = promises
   // console.log('href:', href)
   // await go(page, href)
 
-  await page.goto('https://www.mzitu.com/248333')
-
   let imgList = []
   let first = true
   let path
   let title
-  while (true) {
 
+  page.on('response', async (res) => {
+    if (res.url().includes('https://imgpc.iimzt.com')) {
+      let buf = await res.buffer()
+      let split = res.url().split('/')
+      let filename = split[split.length - 1]
+      setTimeout(async () => {
+        console.log(`${path}/${filename}`)
+
+        await writeFile(`${path}/${filename}`, buf)
+      }, 10000)
+      // console.log(`${path}/${filename}`)
+
+      // await writeFile(`${path}/${filename}`, buf)
+    }
+  })
+
+  await page.goto('https://www.mzitu.com/247878')
+
+  while (true) {
     console.log('current url: ' + (await page.url()))
 
     try {
@@ -86,8 +97,20 @@ const { readFile, writeFile } = promises
     // let proxyImgAddr = `http://api.scraperapi.com?api_key=2ad954bc26017c2bd2c41a66bb6eb7c3&url=${img}`
 
     // let proxyImgAddr = img
-    await downloadFile(img, `${path}/${filename}`)
-    await page.waitForTimeout(300)
+
+    //下载
+    //法：1-------------
+    // const imgResp = await page.waitForResponse(img, {
+    //   timeout: 10000,
+    // })
+    // const buffer = await imgResp.buffer()
+    // const imgBase64 = buffer.toString('base64')
+    // await writeFile(`${path}/${filename}`, imgBase64, 'base64')
+    //--------------------
+
+    //法：2---------
+    // await downloadFile(img, `${path}/${filename}`)
+    // await page.waitForTimeout(300)
 
     imgList.push(img)
 
@@ -120,24 +143,22 @@ const { readFile, writeFile } = promises
         tags: [{ name: tag, type: 0 }],
       }
       console.log(data)
-  
 
       let res = await post('/pic', data)
       console.log(res)
-      if(!res){
+      if (!res) {
         break
       }
 
       //清空imgList
       imgList = []
-
     }
 
     await page.click('.pagenavi a:last-child')
   }
 
   //等待图片下载
-  await page.waitForTimeout(10000)
+  // await page.waitForTimeout(30000)
   await browser.close()
 })()
 
