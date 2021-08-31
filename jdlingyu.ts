@@ -28,10 +28,10 @@ import * as dayjs from 'dayjs'
   })
 
   //图片
-  // await goPic(page)
+  await goPic(page)
 
   //文章
-  await goArticles(page)
+  // await goArticles(page)
 
   await browser.close()
 })()
@@ -42,7 +42,7 @@ async function goto(page: Page, url: string) {
 
 async function goPic(page: Page) {
   //图片
-  await goto(page, 'https://www.jdlingyu.com/96018.html')
+  await goto(page, 'https://www.jdlingyu.com/96595.html')
 
   while (true) {
     let title = await page.$eval('.entry-header h1', (el) => el.textContent)
@@ -64,6 +64,7 @@ async function goPic(page: Page) {
 
     let res = await post('/pic', data)
     console.log(res)
+    if (!res) break
 
     await page.waitForTimeout(300)
     try {
@@ -77,7 +78,7 @@ async function goPic(page: Page) {
 }
 
 async function goArticles(page: Page) {
-  await goto(page, 'https://www.jdlingyu.com/95707.html')
+  await goto(page, 'https://www.jdlingyu.com/96195.html')
 
   let lastCreateTime = null
   let count = 0
@@ -107,7 +108,10 @@ async function goArticles(page: Page) {
     console.log(postData.title, lastCreateTime)
 
     try {
-      await post('news', postData)
+      let ok = await post('news', postData)
+      if (!ok) {
+        break
+      }
     } catch (err) {
       console.log(err)
     }

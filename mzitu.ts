@@ -46,13 +46,14 @@ const { readFile, writeFile } = promises
   // console.log('href:', href)
   // await go(page, href)
 
-  await page.goto('https://www.mzitu.com/246886')
+  await page.goto('https://www.mzitu.com/248333')
 
   let imgList = []
   let first = true
   let path
   let title
   while (true) {
+
     console.log('current url: ' + (await page.url()))
 
     try {
@@ -119,14 +120,17 @@ const { readFile, writeFile } = promises
         tags: [{ name: tag, type: 0 }],
       }
       console.log(data)
+  
 
       let res = await post('/pic', data)
       console.log(res)
+      if(!res){
+        break
+      }
 
       //清空imgList
       imgList = []
 
-      break
     }
 
     await page.click('.pagenavi a:last-child')
@@ -140,4 +144,3 @@ const { readFile, writeFile } = promises
 async function go(page: Page, url: string) {
   await Promise.all([page.waitForNavigation(), page.goto(url)])
 }
-
