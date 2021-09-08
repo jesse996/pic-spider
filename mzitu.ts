@@ -62,7 +62,7 @@ const { readFile, writeFile } = promises
     }
   })
 
-  await page.goto('https://www.mzitu.com/247878')
+  await page.goto('https://www.mzitu.com/249184')
 
   while (true) {
     console.log('current url: ' + (await page.url()))
@@ -77,8 +77,8 @@ const { readFile, writeFile } = promises
       el.getAttribute('src')
     )
 
-    let split = img.split('/')
-    let filename = split[split.length - 1]
+    // let split = img.split('/')
+    // let filename = split[split.length - 1]
 
     if (first) {
       title = (await page.$eval('.main-title', (el) => el.textContent))

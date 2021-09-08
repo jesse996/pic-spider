@@ -42,7 +42,7 @@ async function goto(page: Page, url: string) {
 
 async function goPic(page: Page) {
   //图片
-  await goto(page, 'https://www.jdlingyu.com/96595.html')
+  await goto(page, 'https://www.jdlingyu.com/96943.html')
 
   while (true) {
     let title = await page.$eval('.entry-header h1', (el) => el.textContent)
